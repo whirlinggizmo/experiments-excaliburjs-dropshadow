@@ -1,4 +1,4 @@
-import { Color, Engine, Vector, Font, Label, vec, Actor, TextAlign } from "excalibur";
+import { Color, Engine, Vector, Font, Label, vec, Actor, TextAlign, DisplayMode } from "excalibur";
 import { Resources, loader } from "./resources";
 import { Treetop } from "./treetop";
 import { createDropShadowMaterial } from "./dropshadowmaterial";
@@ -20,7 +20,12 @@ function addLabel(actor: Actor, text: string) {
 
 class Game extends Engine {
   constructor() {
-    super({ width: 800, height: 600 });
+    super({
+      width: 800,
+      height: 600,
+      displayMode: DisplayMode.FitScreen,
+      canvasElementId: 'renderCanvas',
+    });
   }
   initialize() {
     const verticalSpacing = 100;
