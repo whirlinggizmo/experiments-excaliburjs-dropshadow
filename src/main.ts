@@ -2,6 +2,7 @@ import { Color, Engine, Vector, Font, Label, vec, Actor, TextAlign, DisplayMode 
 import { Resources, loader } from "./resources";
 import { Treetop } from "./treetop";
 import { createDropShadowMaterial } from "./dropshadowmaterial";
+import { isMobile } from "./util/platform";
 
 function addLabel(actor: Actor, text: string) {
   const label = new Label({
@@ -21,8 +22,8 @@ function addLabel(actor: Actor, text: string) {
 class Game extends Engine {
   constructor() {
     super({
-      width: 800,
-      height: 600,
+      width: isMobile ? 1280 / 4 : 1920,
+      height: isMobile ? 2280 / 4 : 1080,
       displayMode: DisplayMode.FitScreen,
       canvasElementId: 'renderCanvas',
     });
