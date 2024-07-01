@@ -1,18 +1,13 @@
 {
-  "name": "template-ts-vite",
+  "name": "experiments-excaliburjs-dropshadow",
   "version": "1.1.0",
-  "description": "Excalibur TypeScript template for Vite",
+  "description": "Excalibur DropShadow Experiment",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "start": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview",
-    "test": "npm run build && ex-test -d ./dist -t ./test/test.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/excaliburjs/template-ts-vite.git"
+    "serve": "vite preview"
   },
   "keywords": [
     "excalibur",
@@ -20,12 +15,9 @@
     "vite",
     "game-engine"
   ],
-  "author": "Erik Onarheim",
-  "license": "BSD-2-Clause",
-  "bugs": {
-    "url": "https://github.com/excaliburjs/template-ts-vite/issues"
-  },
-  "homepage": "https://github.com/excaliburjs/template-ts-vite#readme",
+  "author": "Rob Knopf",
+  "license": "MIT",
+  "homepage": "https://whirlinggizmo.com",
   "devDependencies": {
     "excalibur": "0.29.3",
     "typescript": "5.5.2",
