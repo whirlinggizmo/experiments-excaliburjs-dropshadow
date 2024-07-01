@@ -1,8 +1,10 @@
 import { ImageSource, Loader } from "excalibur";
-import sword from "./images/sword.png";
+import treetopTrimmed from "./images/treetop-trimmed.png";
+import treetopNotTrimmed from "./images/treetop-not-trimmed.png";
 
 export const Resources = {
-  Sword: new ImageSource(sword)
+  TreetopTrimmed: new ImageSource(treetopTrimmed),
+  TreetopNotTrimmed: new ImageSource(treetopNotTrimmed),
 } as const;
 
 export const loader = new Loader();
