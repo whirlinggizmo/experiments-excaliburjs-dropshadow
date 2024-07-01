@@ -7,7 +7,9 @@
     "dev": "vite",
     "start": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [
     "excalibur",
@@ -17,9 +19,10 @@
   ],
   "author": "Rob Knopf",
   "license": "MIT",
-  "homepage": "https://whirlinggizmo.com",
+  "homepage": "https://whirlinggizmo.github.io/experiments-excaliburjs-dropshadow/",
   "devDependencies": {
     "excalibur": "0.29.3",
+    "gh-pages": "^6.1.1",
     "typescript": "5.5.2",
     "vite": "5.3.2"
   },
