@@ -12,7 +12,7 @@ export class Treetop extends Actor {
     this.imageSource = imageSource;
   }
 
-  onInitialize() {
+  override onInitialize() {
     this.graphics.add(this.imageSource.toSprite());
     this.on('pointerup', () => {
       alert('yo');
