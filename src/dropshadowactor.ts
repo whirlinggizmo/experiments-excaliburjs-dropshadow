@@ -20,36 +20,17 @@ export class DropShadowActor extends Actor {
     public shadowOffset: Vector;
 
     /**
-     * The tint color of the shadow.
-     * Avoid creating a new Color object every draw frame.
-     */
-    private _shadowTint: Color;
-
-    /**
-     * The previous tint color of the actor.
-     * Avoid creating a new Color object every draw frame.
-     */
-    private _previousTint!: Color;
-
-    /**
      * The opacity of the shadow.
      */
-    private _shadowOpacity: number;
+    public shadowOpacity: number;
 
     /**
-     * Gets the opacity of the shadow.
-     */
-    public get shadowOpacity(): number {
-        return this._shadowOpacity;
-    }
+    * The previous tint and opacity color of the actor.
+    * Avoids allocation every draw frame.
+    */
+    private _previousTint!: Color;
+    private _previousOpacity!: number;
 
-    /**
-     * Sets the opacity of the shadow.
-     */
-    public set shadowOpacity(value: number) {
-        this._shadowOpacity = value;
-        this._shadowTint.a = this._shadowOpacity;
-    }
 
     /**
      * Creates a new instance of `DropShadowActor`.
@@ -59,16 +40,19 @@ export class DropShadowActor extends Actor {
         super(actorAndDropShadowArgs);
 
         this.shadowVisible = actorAndDropShadowArgs?.shadowVisible ?? true;
-        this._shadowOpacity = actorAndDropShadowArgs?.shadowOpacity ?? 0.5;
-        this._shadowTint = new Color(0, 0, 0, this._shadowOpacity);
-        this.shadowOffset = actorAndDropShadowArgs?.shadowOffset ?? vec(3, 3);
+        this.shadowOpacity = actorAndDropShadowArgs?.shadowOpacity ?? 0.3;
+        this.shadowOffset = actorAndDropShadowArgs?.shadowOffset ?? vec(5, 5);
     }
 
     /**
      * Initializes the drop shadow actor and sets the pre-draw event to draw the shadow.
      */
     override onInitialize(_engine: Engine) {
-        // draw a shadow of the added graphics before drawing the graphics
+
+        /**
+         * Draw a shadow of any added graphics.  
+         * Done before drawing the graphics themselves.
+         */
         this.graphics.onPreDraw = (ctx: ExcaliburGraphicsContext) => {
             if (!this.shadowVisible) {
                 return;
@@ -76,14 +60,17 @@ export class DropShadowActor extends Actor {
 
             // set the shadow tint/opacity
             this._previousTint = ctx.tint;
-            ctx.tint = this._shadowTint;
+            this._previousOpacity = ctx.opacity;
+            ctx.tint = Color.Black;
+            ctx.opacity = this.shadowOpacity;
 
             // loop through all graphics and draw them with the shadow offset
             for (const g of Object.values(this.graphics.graphics)) {
                 g.draw(ctx, -g.width * this.anchor.x + this.shadowOffset.x, -g.height * this.anchor.y + this.shadowOffset.y);
             }
 
-            // put the tint back for the rest of the drawing
+            // put the tint and opacity back for the rest of the drawing
+            ctx.opacity = this._previousOpacity;
             ctx.tint = this._previousTint;
         };
     }
