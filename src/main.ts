@@ -1,83 +1,94 @@
-import { Color, Engine, Vector, Font, Label, vec, Actor, TextAlign, DisplayMode } from "excalibur";
+import { Color, Engine, vec, Actor, DisplayMode, randomIntInRange, EngineOptions, Line, toRadians, BoundingBox } from "excalibur";
 import { Resources, loader } from "./resources";
-import { Treetop } from "./treetop";
-import { createDropShadowMaterial } from "./dropshadowmaterial";
 import { isMobile } from "./util/platform";
 import { DropShadowActor } from "./dropshadowactor";
 
-function addLabel(actor: Actor, text: string) {
-  const label = new Label({
-    pos: vec(0, actor.height / 2 + 10),
-    text: text,
-    font: new Font({
-      size: 18,
-      textAlign: TextAlign.Center,
-      family: 'arial',
-    }),
-    color: Color.White,
-
-  });
-  actor.addChild(label);
-}
 
 class Game extends Engine {
-  constructor() {
+  constructor(engineOptions?: EngineOptions) {
     super({
-      width: isMobile ? 1280 / 4 : 1920,
-      height: isMobile ? 2280 / 4 : 1080,
-      displayMode: DisplayMode.FitScreen,
-      canvasElementId: 'renderCanvas',
+      ...{
+        width: isMobile ? 1280 / 4 : 1920,
+        height: isMobile ? 2280 / 4 : 1080,
+        displayMode: DisplayMode.FitScreen,
+        canvasElementId: 'renderCanvas',
+      },
+      ...engineOptions
     });
   }
   initialize() {
-    const verticalSpacing = 100;
-    const dropShadowMaterial = createDropShadowMaterial(this.graphicsContext, new Color(0, 0, 0, 0.3), new Vector(-5, -5));
-    let currentYPosition = 0;
 
-    // treetop, trimmed sprite, no shadow material
-    const treetop_no_shadow = new Treetop(Resources.TreetopTrimmed);
-    treetop_no_shadow.pos.y = currentYPosition;
-    this.add(treetop_no_shadow);
-    addLabel(treetop_no_shadow, 'No shadow');
-    currentYPosition += treetop_no_shadow.height + verticalSpacing;
-    // Note: no drop shadow material set
+    let actorsBoundingBox: BoundingBox = new BoundingBox();
 
-    // treetop, trimmed sprite + shadow material
-    const treetop_trimmed_shadow = new Treetop(Resources.TreetopTrimmed);
-    treetop_trimmed_shadow.pos.y = currentYPosition;
-    this.add(treetop_trimmed_shadow);
-    addLabel(treetop_trimmed_shadow, 'Trimmed Sprite + DropShadowMaterial\n - No empty space around sprite\n - Shadow is clipped');
-    currentYPosition += treetop_trimmed_shadow.height + verticalSpacing;
-    // set the drop shadow material
-    treetop_trimmed_shadow.graphics.material = dropShadowMaterial;
+    // Create a forest of DropShadowActor trees!
+    const numTrees = 2;
+    for (let i = 0; i < numTrees; i++) {
+      let actor = new DropShadowActor({
+        pos: vec(Math.random() * game.screen.drawWidth, Math.random() * game.screen.drawHeight),
+        rotation: Math.random() * Math.PI * 2,
+        scale: vec(1, 1).scale(randomIntInRange(1, 3)),
+        width: 64,
+        height: 64,
+        color: Color.White,
+      });
+      actor.graphics.use(Resources.TreetopTrimmed.toSprite());
+      this.add(actor);
 
-    // treetop, untrimmed sprite + shadow material
-    const treetop_not_trimmed_shadow = new Treetop(Resources.TreetopNotTrimmed);
-    treetop_not_trimmed_shadow.pos.y = currentYPosition;
-    this.add(treetop_not_trimmed_shadow);
-    addLabel(treetop_not_trimmed_shadow, 'Untrimmed Sprite + DropShadowMaterial\n - Extra empty space around sprite\n - Shadow is not clipped');
-    currentYPosition += treetop_not_trimmed_shadow.height + verticalSpacing;
-    // set the drop shadow material
-    treetop_not_trimmed_shadow.graphics.material = dropShadowMaterial;
+      // debug: set the actor to known pos/scale/rotation
+      actor.scale = vec(5, 5);
+      //actor.rotation = toRadians(0);
+      actor.pos = vec(i * actor.width, 0);
+      // end debug: known pos/scale/rotation
 
-    // add a DropShadowActor to compare
-    const dropShadowActor = new DropShadowActor({
-      pos: vec(0, currentYPosition),
-      width: 64,
-      height: 64
-    });
-    dropShadowActor.graphics.add(Resources.TreetopTrimmed.toSprite());
-    this.add(dropShadowActor);
-    addLabel(dropShadowActor, 'DropShadowActor\n - No DropShadowMaterial\n - No empty space around sprite\n - Shadow is not clipped');
-    currentYPosition += treetop_no_shadow.height + verticalSpacing;
+      /*
+      // debug: draw line to visualize rotation direction
+      const rotationReference = new Actor({
+        anchor: actor.anchor.clone(),
+        pos: actor.pos.clone(),
+        scale: actor.scale.clone(),
+        width: actor.graphics.localBounds.width,
+        height: actor.graphics.localBounds.height,
+        color: Color.Green // box if we don't add the graphic line
+      });
 
+      const startingPos = vec(
+        actor.center.x,
+        actor.center.y
+      );
 
-    // look at the third tree for centering
-    this.currentScene.camera.strategy.lockToActor(treetop_not_trimmed_shadow);
+      const endingPos = vec(
+        startingPos.x + 32,
+        startingPos.y + 32
+      );
+      // NOTE:  Is there a bug with drawLine? 
+      // Shouldn't this draw a line from the center of the actor to the bottom right corner?
+      // https://github.com/excaliburjs/Excalibur/issues/3117
+      console.log('actor.pos', actor.pos);
+      console.log('line.startingPos', startingPos);
+      console.log('line.endingPos', endingPos);
 
-    this.start(loader);
+      rotationReference.graphics.use(new Line({
+        start: startingPos,
+        end: endingPos,
+        color: Color.Red
+      }));
+      this.add(rotationReference);
+      // end debug: line for rotation direction
+*/
+      // add the actor to the overall bounding box
+      actorsBoundingBox = actorsBoundingBox.combine(actor.graphics.bounds);
+
+    }
+
+    // center the camera on the actors 
+    this.currentScene.camera.x = actorsBoundingBox.center.x;
+    this.currentScene.camera.y = actorsBoundingBox.center.y;
+    //
+
   }
 }
 
-export const game = new Game();
-game.initialize();
+export const game = new Game({ suppressPlayButton: true });
+game.start(loader).then(() => {
+  game.initialize()
+});

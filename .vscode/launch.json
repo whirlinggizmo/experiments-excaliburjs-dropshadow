@@ -9,7 +9,7 @@
             "request": "launch",
             "runtimeExecutable": "/usr/bin/brave-browser",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:5173",
+            "url": "https://localhost:4444",
             "webRoot": "${workspaceFolder}"
         }
     ]
