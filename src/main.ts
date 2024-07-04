@@ -1,7 +1,7 @@
-import { Color, Engine, vec, Actor, DisplayMode, randomIntInRange, EngineOptions, Line, toRadians, BoundingBox } from "excalibur";
+import { Color, Engine, vec, DisplayMode, randomIntInRange, EngineOptions, BoundingBox } from "excalibur";
 import { Resources, loader } from "./resources";
 import { isMobile } from "./util/platform";
-import { DropShadowActor } from "./dropshadowactor";
+import { DropShadowActor } from "./dropshadow/dropshadowactor";
 
 
 class Game extends Engine {
@@ -36,45 +36,10 @@ class Game extends Engine {
 
       // debug: set the actor to known pos/scale/rotation
       actor.scale = vec(5, 5);
-      //actor.rotation = toRadians(0);
+      //actor.rotation = Math.PI / 180 * 45; // 45 degrees
       actor.pos = vec(i * actor.width, 0);
       // end debug: known pos/scale/rotation
 
-      /*
-      // debug: draw line to visualize rotation direction
-      const rotationReference = new Actor({
-        anchor: actor.anchor.clone(),
-        pos: actor.pos.clone(),
-        scale: actor.scale.clone(),
-        width: actor.graphics.localBounds.width,
-        height: actor.graphics.localBounds.height,
-        color: Color.Green // box if we don't add the graphic line
-      });
-
-      const startingPos = vec(
-        actor.center.x,
-        actor.center.y
-      );
-
-      const endingPos = vec(
-        startingPos.x + 32,
-        startingPos.y + 32
-      );
-      // NOTE:  Is there a bug with drawLine? 
-      // Shouldn't this draw a line from the center of the actor to the bottom right corner?
-      // https://github.com/excaliburjs/Excalibur/issues/3117
-      console.log('actor.pos', actor.pos);
-      console.log('line.startingPos', startingPos);
-      console.log('line.endingPos', endingPos);
-
-      rotationReference.graphics.use(new Line({
-        start: startingPos,
-        end: endingPos,
-        color: Color.Red
-      }));
-      this.add(rotationReference);
-      // end debug: line for rotation direction
-*/
       // add the actor to the overall bounding box
       actorsBoundingBox = actorsBoundingBox.combine(actor.graphics.bounds);
 
