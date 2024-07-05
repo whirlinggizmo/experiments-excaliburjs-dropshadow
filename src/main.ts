@@ -1,4 +1,4 @@
-import { Color, Engine, vec, DisplayMode, EngineOptions, BoundingBox, ActionCompleteEvent, Actor } from "excalibur";
+import { Color, Engine, vec, DisplayMode, EngineOptions, BoundingBox, Actor } from "excalibur";
 import { Resources, loader } from "./resources";
 import { isMobile } from "./util/platform";
 import { randomInteger, randomNumber, setRandomSeed } from "./util/random";
