@@ -102,6 +102,9 @@ class Game extends Engine {
 setRandomSeed("Excalibur Rocks!");
 const game = new Game({ suppressPlayButton: true });
 
-await game.start(loader);
-await game.initialize();
-await game.run();
+// Start the game
+(async () => {
+  await game.start(loader);
+  await game.initialize();
+  await game.run();
+})();
