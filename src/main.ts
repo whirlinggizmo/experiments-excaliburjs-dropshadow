@@ -1,8 +1,11 @@
-import { Color, Engine, vec, DisplayMode, EngineOptions, BoundingBox, Actor } from "excalibur";
+import { Color, Text, Engine, vec, DisplayMode, EngineOptions, BoundingBox, Actor, Font, Vector } from "excalibur";
 import { Resources, loader } from "./resources";
 import { isMobile } from "./util/platform";
 import { randomInteger, randomNumber, setRandomSeed } from "./util/random";
 import { DropShadowActor } from "./dropshadow/dropshadowactor";
+import { DropShadowLightHelper } from "./dropshadow/dropshadowlighthelper";
+import { zoomCameraToBoundingBox } from "./util/camera";
+
 
 class Game extends Engine {
   constructor(engineOptions?: EngineOptions) {
@@ -17,17 +20,20 @@ class Game extends Engine {
     });
   }
 
-  sunDirection = vec(5, 5);
+  lightSourceDirection = vec(5, 5);
   treeActors: DropShadowActor[] = [];
 
-  initialize() {
-    let actorsBoundingBox: BoundingBox = new BoundingBox();
 
+  async initialize() {
     // Create a forest of DropShadowActor trees!
-    const numTrees = 50;
+    const numTrees = 75;
+    const aspectRatio = this.currentScene.camera.viewport.height / this.currentScene.camera.viewport.width;
+    const forestWidth = 2000;
+    const forestHeight = forestWidth * aspectRatio;
+
     for (let i = 0; i < numTrees; i++) {
       let actor = new DropShadowActor({
-        pos: vec(randomInteger(0, game.screen.drawWidth), randomInteger(0, game.screen.drawHeight)),
+        pos: vec(randomInteger(0, forestWidth), randomInteger(0, forestHeight)),
         rotation: randomNumber() * Math.PI * 2,
         scale: vec(1, 1).scale(randomNumber(1, 3)),
         width: 64,
@@ -36,58 +42,66 @@ class Game extends Engine {
       });
       actor.graphics.use(Resources.TreetopTrimmed.toSprite());
       this.add(actor);
-      actor.shadowOffset = this.sunDirection;
       actor.name = `Actor ${i}`;
       this.treeActors.push(actor);
-
-      // debug: set the actor to known pos/scale/rotation
-      //actor.scale = vec(5, 5);
-      //actor.rotation = Math.PI / 180 * 0; // 45 degrees
-      //actor.pos = vec(i * actor.width * 2, 0);
-      // end debug: known pos/scale/rotation
-
-      // add the actor to the overall bounding box
-      actorsBoundingBox = actorsBoundingBox.combine(actor.graphics.bounds);
-
     }
 
-    // center the camera on the actors 
-    this.currentScene.camera.x = actorsBoundingBox.center.x;
-    this.currentScene.camera.y = actorsBoundingBox.center.y;
+    // optionally add a light source helper
+    const dropShadowLightHelper = new DropShadowLightHelper(
+      {
+        lightSourceDirection: this.lightSourceDirection,
+        maxShadowLength: 7,
+        dropShadowActors: this.treeActors,
+        lightSourceType: "directional",  // "1" for directional, "2" for omni
+        visualize: true,          // "3" toggles line visualization
+        interactive: true,        // "0" toggle interactive
+      }
+    );
+    dropShadowLightHelper.graphics.use(Resources.Sun.toSprite());
+    this.add(dropShadowLightHelper);
 
-
-    const sun = new Actor({
+    // add some text to explain the controls
+    const text = new Actor({
       pos: vec(0, 0),
-      width: 32,
-      height: 32,
+      width: 100,
+      height: 100,
+      anchor: Vector.Zero
+    });
+    text.graphics.add(new Text({
+      text: `
+      [Keyboad Controls]:
+      1: Directional Light
+      2: Omni Light
+      3: Toggle Line Visualization
+      0: Toggle Interativity`,
       color: Color.White,
-    });
-    sun.graphics.use(Resources.Sun.toSprite());
-    sun.graphics.anchor = vec(0.5, 0.5);
-    this.add(sun);
+      font: new Font({ size: 20, family: 'Arial' }),
+    }));
+    this.add(text);
 
-    // Update the shadow direction every mouse move
-    this.input.pointers.primary.on('move', (evt) => {
-      // move the sun to the mouse location
-      sun.pos = evt.worldPos;
-
-      // loop through the actors and update the shadow direction based on the mouse location
-      this.treeActors.forEach(actor => {
-        if (actor instanceof DropShadowActor) {
-          const direction = vec(evt.worldPos.x - actor.pos.x, evt.worldPos.y - actor.pos.y);
-          const normalizedDirection = direction.normalize();
-          actor.shadowOffset = normalizedDirection.scale(-8);
-        }
-      });
-    });
   }
-}
 
+  async run() {
+    // Create a bounding box that encompasses all tree actors
+    // then zoom the camera to fit the bounding box
+    let treesBoundingBox: BoundingBox = new BoundingBox();
+    // add the actor to the overall bounding box
+    for (const actor of this.treeActors) {
+      treesBoundingBox = treesBoundingBox.combine(actor.graphics.bounds);
+    }
+    // Zoom the camera to fit the bounding box of all tree actors, with padding
+    const padding = Math.min(this.currentScene.camera.viewport.width, this.currentScene.camera.viewport.height) * 0.01;
+    // zoom the camera out so our zoom in is more dramatic
+    this.currentScene.camera.zoom = 0.1;
+    // zoom in to include the tree bounding box
+    await zoomCameraToBoundingBox(this.currentScene.camera, treesBoundingBox, padding, 1000);
+  }
+
+}
 
 setRandomSeed("Excalibur Rocks!");
 const game = new Game({ suppressPlayButton: true });
 
-game.start(loader).then(() => {
-  game.initialize()
-
-});
+await game.start(loader);
+await game.initialize();
+await game.run();
