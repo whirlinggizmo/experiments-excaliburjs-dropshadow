@@ -1,4 +1,4 @@
-import { Camera, BoundingBox, vec } from 'excalibur';
+import { Camera, BoundingBox } from 'excalibur';
 
 
 export function calculateZoomCameraToBoundingBox(camera: Camera, boundingBox: BoundingBox, padding: number = 0) {
