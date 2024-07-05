@@ -1,10 +1,12 @@
 import { ImageSource, Loader } from "excalibur";
 import treetopTrimmed from "./images/treetop-trimmed.png";
 import treetopNotTrimmed from "./images/treetop-not-trimmed.png";
+import sun from "./images/sun.png";
 
 export const Resources = {
   TreetopTrimmed: new ImageSource(treetopTrimmed),
   TreetopNotTrimmed: new ImageSource(treetopNotTrimmed),
+  Sun: new ImageSource(sun),
 } as const;
 
 export const loader = new Loader();

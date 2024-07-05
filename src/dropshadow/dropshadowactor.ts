@@ -30,6 +30,7 @@ export class DropShadowActor extends Actor {
      */
     public shadowOnly: boolean;
 
+
     /**
      * Creates a new instance of `DropShadowActor`.
      * @param actorAndDropShadowArgs Optional arguments for the actor and drop shadow.
@@ -54,7 +55,6 @@ export class DropShadowActor extends Actor {
         // Used for shadowsOnly rendering
         let previousGraphicVisibility: boolean;
 
-
         this.graphics.onPreDraw = (_ctx: ExcaliburGraphicsContext, _elapsedMilliseconds: number) => {
             // Turn off the graphic visiblity, we control all the drawing in onPostDraw
             previousGraphicVisibility = this.graphics.visible;
@@ -66,9 +66,10 @@ export class DropShadowActor extends Actor {
          * we need to reset the visibility of the graphics.
          */
         this.graphics.onPostDraw = (_ctx: ExcaliburGraphicsContext, _elapsedMilliseconds: number) => {
+
             // Draw the shadows
             if (this.shadowVisible) {
-                _drawShadows(_ctx);
+                this._drawShadows(_ctx);
             }
 
             // restore the graphic visibility
@@ -76,65 +77,63 @@ export class DropShadowActor extends Actor {
 
             // draw the graphics if we're not in shadowOnly mode
             if (!this.shadowOnly) {
-                _drawGraphics(_ctx);
+                this._drawGraphics(_ctx);
             }
         }
-
-
-        /**
-         * Draws the shadows for the actor.
-         * @param ctx - The ExcaliburGraphicsContext used for drawing.
-         */
-        const _drawShadows = (ctx: ExcaliburGraphicsContext) => {
-            if (!this.shadowVisible) {
-                return;
-            }
-
-            if (this.graphics.current) {
-                // Save the context, we change the tint and opacity for shadows
-                ctx.save();
-                ctx.tint = Color.Black;
-                ctx.opacity = this.shadowOpacity;
-
-                // Calculate cosine and sine of the rotation angle
-                const cosRotation = Math.cos(this.rotation);
-                const sinRotation = Math.sin(this.rotation);
-
-                // Apply rotation to the shadow offset
-                const x = this.shadowOffset.x * cosRotation - this.shadowOffset.y * sinRotation;
-                const y = this.shadowOffset.x * sinRotation + this.shadowOffset.y * cosRotation;
-
-                /*
-                console.debug('this.rotation', this.rotation);
-                console.debug('this.graphics.current.rotation', this.graphics.current.rotation);
-                console.debug('this.shadowOffset', this.shadowOffset);
-                console.debug('rotated shadowOffset', vec(x, y));
-                */
-
-                // Draw the graphics with the black tint and opacity, giving it a shadow effect
-                // Adjust the drawing position to ensure it aligns with the rotated offset correctly
-                this.graphics.current.draw(
-                    ctx,
-                    -this.graphics.current.width * this.anchor.x - x,
-                    -this.graphics.current.height * this.anchor.y - y
-                );
-
-                // Restore the context
-                ctx.restore();
-            }
-        };
-
-        const _drawGraphics = (ctx: ExcaliburGraphicsContext) => {
-            if (this.graphics.current) {
-                this.graphics.current.draw(
-                    ctx,
-                    -this.graphics.current.width * this.anchor.x,
-                    -this.graphics.current.height * this.anchor.y
-                );
-            }
-        };
-
     }
+
+    /**
+     * Draws the shadows for the actor.
+     * @param ctx - The ExcaliburGraphicsContext used for drawing.
+     */
+    _drawShadows(ctx: ExcaliburGraphicsContext) {
+        if (!this.shadowVisible || !this.graphics.current) {
+            return;
+        }
+
+        // Save the context, we change the tint and opacity for shadows
+        ctx.save();
+
+        // Draw the graphics with the black tint and opacity, giving it a shadow effect
+        ctx.tint = Color.Black;
+        ctx.opacity = this.shadowOpacity;
+
+        // Adjust the drawing position to ensure it offsets correctly, regardless of rotation
+        const m = ctx.getTransform();
+        // undo rotation
+        m.rotate(-this.rotation);
+        // shift
+        m.translate(this.shadowOffset.x, this.shadowOffset.y);
+        // reapply rotation
+        m.rotate(this.rotation);
+
+        this.graphics.current.draw(
+            ctx,
+            -this.graphics.current.width * this.anchor.x,
+            -this.graphics.current.height * this.anchor.y
+        );
+
+        //this.graphics.current.rotation = previousRotation;
+
+
+        // Restore the context
+        ctx.restore();
+
+    };
+
+
+    _drawGraphics(ctx: ExcaliburGraphicsContext) {
+        if (this.graphics.current) {
+            this.graphics.current.draw(
+                ctx,
+                -this.graphics.current.width * this.anchor.x,
+                -this.graphics.current.height * this.anchor.y
+            );
+        }
+    };
+
+
+
 }
 
 
