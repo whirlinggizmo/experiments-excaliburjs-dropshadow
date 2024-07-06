@@ -8,7 +8,7 @@ An actor that draws its graphic twice, once with a black tint and opacity for a 
 The DropShadowActor demo can be found [here](https://whirlinggizmo.github.io/experiments-excaliburjs-dropshadow/)<br>
 
 ### DropShadowMaterial  
-A material and shader to simulate a drop shadow filter.  Ultimately, this was discared since it disrupted some of the batching that Excaliber does for rendering.  Additionally, results were clipped because of the target texture not having enough white space for the shadow to draw.  Trimmed sprites in particular were problematic.  More experimentation around dynamically increasing the target texture size might be done.
+A material and shader to simulate a drop shadow filter.  Ultimately, this was discarded since it disrupted some of the batching that Excaliber does for rendering.  Additionally, results were clipped because of the target texture not having enough white space for the shadow to draw.  Trimmed sprites in particular were problematic.  More experimentation around dynamically increasing the target texture size might be done, but it's archived for now.
 
 
 _Caveat Emptor: My experiments are really just testbeds for some ideas that I've been considering.  As such, there will be broken code, bugs, odd comments and the like.  If you find something useful, _
