@@ -98,6 +98,7 @@ export class DropShadowActor extends Actor {
             return;
         }
 
+
         // Save the context, we change the tint and opacity for shadows
         ctx.save();
 
@@ -118,15 +119,22 @@ export class DropShadowActor extends Actor {
         // Reapply rotation
         m.rotate(this.rotation);
 
+        // lower the z order so shadows are drawn below the actors
+        // TODO:  Will this work with terrain/floors?
+        ctx.z--;
+
         this.graphics.current.draw(
             ctx,
-
             -this.graphics.current.width * this.anchor.x,
             -this.graphics.current.height * this.anchor.y
         );
 
+        // restore the z order
+        ctx.z++;
+
         // Restore the context
         ctx.restore();
+
     }
 
     /**
