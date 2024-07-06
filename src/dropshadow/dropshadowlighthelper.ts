@@ -63,6 +63,11 @@ export class DropShadowLightHelper extends Actor {
             actor.shadowOffset = this.lightSourceDirection;
             actor.maxShadowLength = this.maxShadowLength;
         }
+
+        // for demo purposes, start the light icon in the center so it's obvious
+        this.pos.x = _engine.currentScene.camera.viewport.center.x;
+        this.pos.y = _engine.currentScene.camera.viewport.center.y;
+
     }
 
     addDropShadowActor(actor: DropShadowActor) {
