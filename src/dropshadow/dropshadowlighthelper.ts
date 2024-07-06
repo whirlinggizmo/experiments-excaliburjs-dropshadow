@@ -137,25 +137,6 @@ export class DropShadowLightHelper extends Actor {
                 shadowLength *= distance / this.falloffRange;
             }
             actor.shadowOffset = lightSourceDirection.normalize().scale(shadowLength);
-
-
-            //actor.shadowOffset = lightSourceDirection.normalize().scale(Math.max(0, this.maxShadowLength - distance));
-            //actor.shadowOffset = lightSourceDirection;//.normalize().scale(distance);
-            //actor.maxShadowLength = this.maxShadowLength;
-
-
-            //actor.pos.distance(this.pos);
-            //const shadowLength = Math.max(0, this.maxShadowLength - distance);
-
-            // Calculate direction vector from light to actor
-            //const direction = actor.pos.sub(this.pos).normalize();
-
-            // Scale direction vector by shadowLength
-            //actor.shadowOffset = direction.scale(shadowLength);
-
-
-
-            //actor.maxShadowLength = this.maxShadowLength;
         });
     }
 
@@ -223,8 +204,8 @@ export class DropShadowLightHelper extends Actor {
         <div class="topleft framed">
         <strong>Keyboard Controls</strong><br>
         <hr>
-        1: Directional Light<br>
-        2: Point Light<br>
+        1: Use Directional Light<br>
+        2: Use Point Light<br>
         3: Toggle Line Visualization<br>
         0: Toggle Interactivity<br>
         </div>
