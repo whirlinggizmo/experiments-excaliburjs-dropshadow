@@ -1,7 +1,7 @@
 import { Color, Engine, vec, DisplayMode, EngineOptions, BoundingBox } from "excalibur";
 import { Resources, loader } from "./resources";
 import { isMobile } from "./util/platform";
-import { randomInteger, randomNumber, setRandomSeed } from "./util/random";
+import { random } from "./util/random";
 import { DropShadowActor } from "./dropshadow/dropshadowactor";
 import { DropShadowLightHelper } from "./dropshadow/dropshadowlighthelper";
 import { zoomCameraToBoundingBox } from "./util/camera";
@@ -33,9 +33,9 @@ class Game extends Engine {
 
     for (let i = 0; i < numTrees; i++) {
       let actor = new DropShadowActor({
-        pos: vec(randomInteger(0, forestWidth), randomInteger(0, forestHeight)),
-        rotation: randomNumber() * Math.PI * 2,
-        scale: vec(1, 1).scale(randomNumber(1, 3)),
+        pos: vec(random.randomInteger(0, forestWidth), random.randomInteger(0, forestHeight)),
+        rotation: random.randomNumber() * Math.PI * 2,
+        scale: vec(1, 1).scale(random.randomNumber(1, 3)),
         width: 64,
         height: 64,
         color: Color.White,
@@ -78,7 +78,7 @@ class Game extends Engine {
   }
 }
 
-setRandomSeed("Excalibur Rocks!");
+random.reseed("Excalibur Rocks!");
 const game = new Game({ suppressPlayButton: true });
 
 // Start the game
