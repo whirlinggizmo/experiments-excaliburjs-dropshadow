@@ -8,13 +8,20 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/png" href="src/images/favicon.png">
-  <link href="src/style.css" rel="stylesheet" />
+  <link href="src/assets/css/index.css" rel="stylesheet" />
+  <link href="src/assets/css/ui.css" rel="stylesheet" />
 
 </head>
 
 <body class="unselectable" oncontextmenu="return false;">
-  <div id="gameContainer" class="game-container">
-    <canvas id="renderCanvas"></canvas>
+
+  <div id="wrapper">
+    <div id="gameContainer">
+      <!-- <audio id="bgm" loop="true" src="assets/audio/ethernight.mp3"></audio>  -->
+      <!-- <script type="module" src="src/fpsmeter.min.js"> </script> -->
+      <div id="ui"></div>
+      <canvas id="renderCanvas"></canvas>
+    </div>
   </div>
   <script type="module" src="src/main.ts"> </script>
 </body>

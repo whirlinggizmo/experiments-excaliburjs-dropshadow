@@ -1,4 +1,4 @@
-import { Color, Text, Engine, vec, DisplayMode, EngineOptions, BoundingBox, Actor, Font, Vector } from "excalibur";
+import { Color, Engine, vec, DisplayMode, EngineOptions, BoundingBox } from "excalibur";
 import { Resources, loader } from "./resources";
 import { isMobile } from "./util/platform";
 import { randomInteger, randomNumber, setRandomSeed } from "./util/random";
@@ -8,6 +8,10 @@ import { zoomCameraToBoundingBox } from "./util/camera";
 
 
 class Game extends Engine {
+
+  lightSourceDirection = vec(5, 5);
+  treeActors: DropShadowActor[] = [];
+
   constructor(engineOptions?: EngineOptions) {
     super({
       ...{
@@ -20,16 +24,12 @@ class Game extends Engine {
     });
   }
 
-  lightSourceDirection = vec(5, 5);
-  treeActors: DropShadowActor[] = [];
-
 
   async initialize() {
     // Create a forest of DropShadowActor trees!
-    const numTrees = 75;
-    const aspectRatio = this.currentScene.camera.viewport.height / this.currentScene.camera.viewport.width;
-    const forestWidth = 2000;
-    const forestHeight = forestWidth * aspectRatio;
+    const numTrees = 50;
+    const forestWidth = this.drawWidth;
+    const forestHeight = this.drawHeight;
 
     for (let i = 0; i < numTrees; i++) {
       let actor = new DropShadowActor({
@@ -52,33 +52,13 @@ class Game extends Engine {
         lightSourceDirection: this.lightSourceDirection,
         maxShadowLength: 7,
         dropShadowActors: this.treeActors,
-        lightSourceType: "directional",  // "1" for directional, "2" for omni
-        visualize: true,          // "3" toggles line visualization
+        lightSourceType: "point",  // "1" for directional, "2" for point
+        visualize: false,          // "3" toggles line visualization
         interactive: true,        // "0" toggle interactive
       }
     );
     dropShadowLightHelper.graphics.use(Resources.Sun.toSprite());
     this.add(dropShadowLightHelper);
-
-    // add some text to explain the controls
-    const text = new Actor({
-      pos: vec(0, 0),
-      width: 100,
-      height: 100,
-      anchor: Vector.Zero
-    });
-    text.graphics.add(new Text({
-      text: `
-      [Keyboad Controls]:
-      1: Directional Light
-      2: Omni Light
-      3: Toggle Line Visualization
-      0: Toggle Interativity`,
-      color: Color.White,
-      font: new Font({ size: 20, family: 'Arial' }),
-    }));
-    this.add(text);
-
   }
 
   async run() {
@@ -90,13 +70,12 @@ class Game extends Engine {
       treesBoundingBox = treesBoundingBox.combine(actor.graphics.bounds);
     }
     // Zoom the camera to fit the bounding box of all tree actors, with padding
-    const padding = Math.min(this.currentScene.camera.viewport.width, this.currentScene.camera.viewport.height) * 0.01;
+    const padding = Math.max(this.currentScene.camera.viewport.width, this.currentScene.camera.viewport.height) * 0.01;
     // zoom the camera out so our zoom in is more dramatic
     this.currentScene.camera.zoom = 0.1;
     // zoom in to include the tree bounding box
     await zoomCameraToBoundingBox(this.currentScene.camera, treesBoundingBox, padding, 1000);
   }
-
 }
 
 setRandomSeed("Excalibur Rocks!");
